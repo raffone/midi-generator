@@ -39,7 +39,7 @@ def get_note(name='C', root=3, span=False, random=False):
         pitch = root
 
     # Valore midi
-    value = notes[root][name]
+    value = notes[pitch][name]
 
     return {'name': name, 'value': value, 'pitch': pitch, 'index': index}
 
@@ -47,15 +47,8 @@ def get_note(name='C', root=3, span=False, random=False):
 def play_note(note=60, duration=1, velocity=127):
     global STACK
 
-    # Se esiste gia interrompi la nota prima di suonarla
-    # midiout.send_message([0x80, note, 0])
-
-    # Se stai gia suonando la stessa nota skippa
-    # if note in STACK:
-    #     return
-
-    # Suona nota.\
-    print '%s nuova, aggiungo' % (note)
+    # Suona nota.
+    # print '%s nuova, aggiungo' % (note)
     midiout.send_message([0x90, note, velocity])
 
     # Aggiungi allo stack per la cancellazione allo scadere della durata
@@ -69,42 +62,62 @@ def clear_expired_notes():
     now = time.time()
     for note in STACK.keys():
         if STACK[note] < now:
-            print '%s vecchia, cancello' % (note)
+            # print '%s vecchia, cancello' % (note)
             midiout.send_message([0x80, note, 0])
             del STACK[note]
             # STACK.remove(note);
 
+def clear_all_notes():
+    for note in STACK.keys():
+        midiout.send_message([0x80, note, 0])
+        del STACK[note]
 
 def generate_melody():
     # chord = []
     chance = r.random()
 
-    # Prima nota random
-    note = get_note(root=4, span=2, random=True)
-    if note['value'] in STACK:
-        return
+    # Se stack vuoto
+    case1 =  len(STACK) == 0 and chance >= .1
 
+    # Se stack non vuoto e non supeiore a 3
+    case2 =  len(STACK) != 0 and len(STACK) <= 3 and chance >= .7
 
-    duration = r.choice(BASE_DURATIONS)
-    play_note(note['value'], duration, 127)
+    if (case1 or case2):
+        # Prima nota random
+        note = get_note(root=4, span=3, random=True)
 
-    # Se durata minima di un battito possibilita' di diventare multinota
-    if duration >= TEMPO and chance > 0.5:
-    # if duration >= TEMPO:
-        var1 = r.randint(2, 5)
-        index1 = SCALE[(note['index'] + var1) % len(SCALE)]
-        note1 = get_note(index1, root=2, span=1, )
-        play_note(note1['value'], duration, 80)
+        # Evito una nota gia nello stack
+        if note['value'] in STACK:
+            return
 
-        var2 = r.randint(2, 5)
-        index2 = SCALE[(note['index'] + var2) % len(SCALE)]
-        note2 = get_note(index1, root=2, span=1, )
-        play_note(note2['value'], duration, 80)
+        # duration = r.choice(BASE_DURATIONS[0:3])
+        play_note(note['value'], r.choice(BASE_DURATIONS[:5]), r.randint(70, 90))
 
+        # # Se durata minima di un battito possibilita' di diventare multinota
+        if chance >= .8:
+            var1 = r.choice([2, 5])
+            # var1 = r.randint(2, 5)
+            index1 = SCALE[(note['index'] + var1) % len(SCALE)]
+            note1 = get_note(index1, root=3, span=2, )
+            play_note(note1['value'], r.choice(BASE_DURATIONS[4:]), r.randint(90, 110))
+
+        if chance >= .9:
+            var2 = r.choice([2, 5])
+            # var2 = r.randint(2, 5)
+            index2 = SCALE[(note['index'] + var2) % len(SCALE)]
+            note2 = get_note(index1, root=2, span=1, )
+            play_note(note2['value'], r.choice(BASE_DURATIONS[7:]), r.randint(60, 100))
+
+    # Rimuovi note finite
     clear_expired_notes()
 
-    print '*'
-    time.sleep(duration)
+    print len(STACK)
+    print '---'
+
+    # time.sleep(duration)
+
+    # Sleep dell'intervallo minimo tra note
+    time.sleep(BASE_DURATIONS[0])
 
 # def generate_chords()
     # pass
@@ -118,27 +131,25 @@ available_ports = midiout.get_ports()
 if available_ports:
     midiout.open_port(0)
 else:
-    midiout.open_virtual_port("My virtual output")
+    midiout.open_virtual_port("Midi Generator")
 
 
 # SETUP MUSIC
 # ----------------------------------------------------------------------------
 # SCALE = scales['minor']['D#']
-SCALE = scales['pentatonic']['D#']
-TEMPO = bpm(60)
-# BASE_DURATIONS = [TEMPO * 0.25, TEMPO * 0.5,
-#                   TEMPO * 0.75, TEMPO, TEMPO * 1.5, TEMPO * 2]
-BASE_DURATIONS = [TEMPO, TEMPO * 1.5, TEMPO * 2, TEMPO, TEMPO * 2.5, TEMPO * 3, TEMPO, TEMPO * 3.5, TEMPO * 4]
+SCALE = scales['minor']['C']
+TEMPO = bpm(80)
+BASE_DURATIONS = [TEMPO * 0.25, TEMPO * 0.33, TEMPO * 0.50, TEMPO * 0.75, TEMPO * 0.66, TEMPO,
+                  TEMPO * 1.25, TEMPO * 1.50, TEMPO * 1.75, TEMPO * 2.00, TEMPO * 2.5]
 
 # MAIN LOOP
 # ----------------------------------------------------------------------------
 
-# print TEMPO, TEMPO * (1 / 4), TEMPO / 2, TEMPO / 4
-# i = 10
-while True:
-    generate_melody()
-    # play_note(60, TEMPO, 127)
-    # time.sleep(TEMPO)
+try:
+    while True:
+        generate_melody()
 
+except (KeyboardInterrupt, SystemExit):
+    clear_all_notes()
+    del midiout
 
-del midiout

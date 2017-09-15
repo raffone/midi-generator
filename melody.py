@@ -6,7 +6,7 @@ from notes import *
 
 class Melody:
 
-    def __init__(self, scale, tempo, lenghts):
+    def __init__(self, scale, tempo, lengths):
 
         self.midiout = rtmidi.MidiOut()
         self.midiout.open_virtual_port("Midi Melody")
@@ -14,7 +14,7 @@ class Melody:
         self.stack = {}
         self.scale = scale
         self.tempo = tempo
-        self.lenghts = lenghts
+        self.lengths = lengths
 
     def get_note(self, name='C', root=3, span=False, random=False):
 
@@ -49,7 +49,7 @@ class Melody:
         now = time.time()
         self.stack[note] = now + duration
 
-    def clear_expired_notes(self):
+    def clear_expired(self):
 
         # print self.stack
         now = time.time()
@@ -60,12 +60,12 @@ class Melody:
                 del self.stack[note]
                 # self.stack.remove(note);
 
-    def clear_all_notes(self):
+    def clear_all(self):
         for note in self.stack.keys():
             self.midiout.send_message([0x80, note, 0])
             del self.stack[note]
 
-    def generate_melody(self):
+    def generate(self):
         # chord = []
         chance = r.random()
 
@@ -83,9 +83,9 @@ class Melody:
             if note['value'] in self.stack:
                 return
 
-            # duration = r.choice(self.lenghts[0:3])
+            # duration = r.choice(self.lengths[0:3])
             self.play_note(note['value'], r.choice(
-                self.lenghts[:5]), r.randint(70, 90))
+                self.lengths[:5]), r.randint(70, 90))
 
             # # Se durata minima di un battito possibilita' di diventare multinota
             if chance >= .8:
@@ -94,7 +94,7 @@ class Melody:
                 index1 = self.scale[(note['index'] + var1) % len(self.scale)]
                 note1 = self.get_note(index1, root=3, span=2, )
                 self.play_note(note1['value'], r.choice(
-                    self.lenghts[4:]), r.randint(90, 110))
+                    self.lengths[4:]), r.randint(90, 110))
 
             if chance >= .9:
                 var2 = r.choice([2, 5])
@@ -102,15 +102,15 @@ class Melody:
                 index2 = self.scale[(note['index'] + var2) % len(self.scale)]
                 note2 = self.get_note(index1, root=2, span=1, )
                 self.play_note(note2['value'], r.choice(
-                    self.lenghts[7:]), r.randint(60, 100))
+                    self.lengths[7:]), r.randint(60, 100))
 
         # Rimuovi note finite
-        self.clear_expired_notes()
+        self.clear_expired()
 
-        print len(self.stack)
-        print '---'
+        # print len(self.stack)
+        # print '---'
 
         # time.sleep(duration)
 
         # Sleep dell'intervallo minimo tra note
-        time.sleep(self.lenghts[0])
+        # time.sleep(self.lengths[0])

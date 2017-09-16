@@ -9,49 +9,22 @@ from instrument import Instrument
 
 class Percussions(Instrument):
 
-    def __init__(self, settings, name='V. Percussions'):
-        Instrument.__init__(self, settings, name)
+    def __init__(self, name, global_settings, settings):
+        Instrument.__init__(self, global_settings, name)
 
-        # Kit
-        self.kit = {
-            'kick': self.generate_rhythm('kick', {
-                'steps': {'count': 32},
-                'pulses': {'count': 2}
-            }),
-            'snare': self.generate_rhythm('snare', {
-                'steps': {'count': 32},
-                'pulses': {'count': 4},
-                'shift': {'count': 4}
-            }),
-            'hihat1': self.generate_rhythm('hihat1', {
-                'steps': {'min': 16, 'max': 32},
-                'pulses': {'min': 4, 'max': 8},
-                'random': True,
-                'mutating': True,
-            }),
-            'perc1': self.generate_rhythm('perc1', {
-                'steps': {'min': 16, 'max': 32, },
-                'pulses': {'min': 4, 'max': 8, },
-                'random': True,
-                'mutating': True,
-            }),
-            'perc2': self.generate_rhythm('perc2', {
-                'steps': {'min': 16, 'max': 32},
-                'pulses': {'min': 4, 'max': 8},
-                'random': True,
-                'mutating': True,
-            }),
-        }
+        self.kit = {}
+
+        for part in settings:
+            self.kit[part['name']] = self.generate_rhythm(part)
 
         self.index = -1
 
     def play_note(self, note, rhythm, velocity=127):
-        name = rhythm['name']
-        pattern = rhythm['pattern']
         settings = rhythm['settings']
+        pattern = rhythm['pattern']
+        name = settings['name']
 
-        # index = (self.index + 1) % rhythm['length']
-        index = (rhythm['index'] + 1) % rhythm['length']
+        index = (rhythm['index'] + 1) % len(rhythm['pattern'])
 
         # verifica se suonare o no la nota in base al ritmo
         if pattern[index] != 0:
@@ -66,26 +39,17 @@ class Percussions(Instrument):
         # Se ritmo random e mutante e alla fine del pattern -> rigenera
         if ('random' in settings and settings['random'] == True
                 and 'mutating' in settings and settings['mutating'] == True
-                and index == rhythm['length'] - 1):
+                and index == len(rhythm['pattern']) - 1):
 
             print('rigenero', name)
 
-            self.kit[name] = self.generate_rhythm(name, settings)
+            self.kit[name] = self.generate_rhythm(settings)
 
         # Incrementa index pattern
         rhythm['index'] += 1
 
     def generate(self):
 
-        self.play_note(notes[2]['C'], self.kit['kick'])
-        self.play_note(notes[2]['D#'], self.kit['snare'])
-        self.play_note(notes[2]['F#'], self.kit['hihat1'])
-        # self.play_note(notes[2]['A#'], self.hihat2)
-        self.play_note(notes[2]['A'], self.kit['perc1'])
-        self.play_note(notes[2]['G'], self.kit['perc2'])
-
-        # Incremento indice
-        # self.index = self.index + 1
-
-        # # Rimuovi note finite
-        # self.clear_expired()
+        for name in self.kit:
+            # print self.kit[name]['settings']['note']
+            self.play_note(self.kit[name]['settings']['note'], self.kit[name])

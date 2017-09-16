@@ -28,6 +28,9 @@ class Sequencer:
             for instrument in self.instruments:
                 instrument.generate()
                 instrument.clear_expired()
+                print instrument.stack
+
+            print '----'
 
             # Intervallo con calcolo del drift
             self.callcount += 1

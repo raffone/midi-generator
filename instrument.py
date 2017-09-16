@@ -7,13 +7,13 @@ from notes import *
 
 class Instrument:
 
-    def __init__(self, settings, name='V. Instrument'):
+    def __init__(self, global_settings, name='V. Instrument'):
         self.midiout = rtmidi.MidiOut()
         self.midiout.open_virtual_port(name)
 
         self.stack = {}
-        self.scale = settings['scale']
-        self.intervals = settings['intervals']
+        self.scale = global_settings['scale']
+        self.intervals = global_settings['intervals']
 
     def clear_expired(self):
         now = time.time()
@@ -43,7 +43,7 @@ class Instrument:
         return result
 
     # Generatori ritmo
-    def generate_rhythm(self, name, s):
+    def generate_rhythm(self, s):
 
         # print s
         # print name
@@ -78,12 +78,9 @@ class Instrument:
         # print pattern
 
         return {
-            'name': name,
-            'pattern': pattern,
-            'length': len(pattern),
-            'index': -1,
             'settings': s,
-
+            'pattern': pattern,
+            'index': -1,
         }
 
     def generate_random_rhythm(self, steps=32, pulses=8):

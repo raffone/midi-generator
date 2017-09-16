@@ -8,8 +8,8 @@ from instrument import Instrument
 
 class Melody(Instrument):
 
-    def __init__(self, settings, name='V. Melody'):
-        Instrument.__init__(self, settings, name)
+    def __init__(self, global_settings, name='Melody'):
+        Instrument.__init__(self, global_settings, name)
 
     def get_note(self, name='C', root=3, span=False, random=False):
 

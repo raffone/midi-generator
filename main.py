@@ -3,76 +3,31 @@ import rtmidi
 from notes import *
 from melody import Melody
 from percussions import Percussions
-from controls import Controls
+from sequencer import Sequencer
 
 
-def bpm(tempo=120.0):
+def calc_bpm(tempo=120.0):
     return (60.0 / float(tempo))
-
-TEMPO = bpm(80.0)
 
 # SETUP MUSIC
 # ----------------------------------------------------------------------------
-settings = {
-    'scale': scales['minor']['D#'],
-    'tempo': TEMPO,
-    'lengths': [TEMPO * 0.25, TEMPO * 0.33, TEMPO * 0.50, TEMPO * 0.75, TEMPO * 0.66, TEMPO,
-                TEMPO * 1.25, TEMPO * 1.50, TEMPO * 1.75, TEMPO * 2.00, TEMPO * 2.5],
-}
+scale = scales['minor']['D#']
+bpm = 80
+base_interval = calc_bpm(bpm)
+intervals = [base_interval * 0.25, base_interval * 0.33, base_interval * 0.50,
+             base_interval * 0.75, base_interval * 0.66, base_interval,
+             base_interval * 1.25, base_interval * 1.50, base_interval * 1.75,
+             base_interval * 2.00, base_interval * 2.50, base_interval * 3.00]
 
-print settings
+settings = {'scale': scale, 'bpm': bpm, 'intervals': intervals}
 
+# SEQUENCER
 # ----------------------------------------------------------------------------
-
-
-# ----------------------------------------------------------------------------
-
-# print TEMPO
-# print BASE_DURATIONS
-# MAIN LOOP
-# ----------------------------------------------------------------------------
-
 melody = Melody(settings)
 percussions = Percussions(settings)
-controls = Controls(settings)
-
+sequencer = Sequencer(settings, [melody, percussions])
 
 try:
-    time.sleep(2)
-    # controls.play_note(notes[1]['C'], 0.1)
-    # controls.play_note(notes[1]['D'])
-    # time.sleep(5)
-
-    callcount = 0
-    interval = 15. / 80
-    started = time.time()
-
-    while True:
-
-        # print time.time()
-        melody.generate()
-        percussions.generate()
-        controls.generate()
-        # print time.time()
-
-        # print melody.stack
-        # print percussions.stack
-        # print controls.stack
-        print '---'
-
-        callcount = callcount + 1
-        # Compensate for drift:
-        # calculate the time when the worker should be called again.
-        nexttime = started + callcount * interval
-        timetowait = max(0, nexttime - time.time())
-
-        time.sleep(timetowait)
-
+    sequencer.play()
 except (KeyboardInterrupt, SystemExit):
-    controls.play_note(notes[1]['C#'])
-
-    melody.clear_all()
-    del melody.midiout
-
-    percussions.clear_all()
-    del percussions.midiout
+    sequencer.stop()

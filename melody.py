@@ -11,13 +11,6 @@ class Melody(Instrument):
     def __init__(self, settings, name='V. Melody'):
         Instrument.__init__(self, settings, name)
 
-        # self.midiout = rtmidi.MidiOut()
-        # self.midiout.open_virtual_port("Midi Melody")
-
-        # self.stack = {}
-
-        # self.lengths = lengths
-
     def get_note(self, name='C', root=3, span=False, random=False):
 
         # Se random scegli a caso nella scala
@@ -69,9 +62,9 @@ class Melody(Instrument):
             if note['value'] in self.stack:
                 return
 
-            # duration = r.choice(self.lengths[0:3])
+            # duration = r.choice(self.intervals[0:3])
             self.play_note(note['value'], r.choice(
-                self.lengths[:5]), r.randint(70, 90))
+                self.intervals[:5]), r.randint(70, 90))
 
             # # Se durata minima di un battito possibilita' di diventare multinota
             if chance >= .8:
@@ -80,7 +73,7 @@ class Melody(Instrument):
                 index1 = self.scale[(note['index'] + var1) % len(self.scale)]
                 note1 = self.get_note(index1, root=3, span=2, )
                 self.play_note(note1['value'], r.choice(
-                    self.lengths[4:]), r.randint(90, 110))
+                    self.intervals[4:]), r.randint(90, 110))
 
             if chance >= .9:
                 var2 = r.choice([2, 5])
@@ -88,7 +81,7 @@ class Melody(Instrument):
                 index2 = self.scale[(note['index'] + var2) % len(self.scale)]
                 note2 = self.get_note(index1, root=2, span=1, )
                 self.play_note(note2['value'], r.choice(
-                    self.lengths[7:]), r.randint(60, 100))
+                    self.intervals[7:]), r.randint(60, 100))
 
-        # Rimuovi note finite
-        self.clear_expired()
+        # # Rimuovi note finite
+        # self.clear_expired()

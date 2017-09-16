@@ -23,8 +23,9 @@ class Controls(Instrument):
         self.stack[note] = now + duration
 
     def generate(self):
+        pass
 
         # self.play_note(notes[1]['C'])
 
-        # Rimuovi note finite
-        self.clear_expired()
+        # # Rimuovi note finite
+        # self.clear_expired()

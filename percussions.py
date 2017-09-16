@@ -59,45 +59,23 @@ class Percussions(Instrument):
             # Suona nota.
             self.midiout.send_message([NOTE_ON, note, velocity])
 
-            # Aggiungi allo stack per la cancellazione allo scadere della
-            # durata
+            # Aggiungi allo stack per la cancellazione allo scadere della durata
             now = time.time()
-            self.stack[note] = now + self.lengths[0]
-
-        # if name == 'perc2':
-        #     print rhythm['index'] + 2
+            self.stack[note] = now + self.intervals[0]
 
         # Se ritmo random e mutante e alla fine del pattern -> rigenera
         if ('random' in settings and settings['random'] == True
                 and 'mutating' in settings and settings['mutating'] == True
                 and index == rhythm['length'] - 1):
 
-            # print('pattern finito', name, pattern, settings['random'], settings['mutating'], rhythm['length'] - 1, index)
             print('rigenero', name)
 
             self.kit[name] = self.generate_rhythm(name, settings)
-            # print self.kit[name]['length'], self.kit[name]['pattern']
 
         # Incrementa index pattern
         rhythm['index'] += 1
 
     def generate(self):
-        # chord = []
-        chance = r.random()
-
-        # self.generate_random_rhythm(32, 8)
-        # print self.testottimo
-
-        # print '<'
-        # print self.kit
-        # print self.snare
-        # print self.hihat1
-        # # print self.hihat2
-        # print self.perc1
-        # print self.perc2
-        # print self.misc1
-        # print self.misc2
-        # print '>'
 
         self.play_note(notes[2]['C'], self.kit['kick'])
         self.play_note(notes[2]['D#'], self.kit['snare'])
@@ -109,5 +87,5 @@ class Percussions(Instrument):
         # Incremento indice
         # self.index = self.index + 1
 
-        # Rimuovi note finite
-        self.clear_expired()
+        # # Rimuovi note finite
+        # self.clear_expired()

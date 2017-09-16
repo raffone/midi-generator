@@ -9,18 +9,11 @@ class Instrument:
 
     def __init__(self, settings, name='V. Instrument'):
         self.midiout = rtmidi.MidiOut()
-        # self.midiout.open_virtual_port("Midi Melody")
-        available_ports = self.midiout.get_ports()
-        # print available_ports
-        # if available_ports:
-        #     self.midiout.open_port(port)
-        # else:
         self.midiout.open_virtual_port(name)
 
         self.stack = {}
         self.scale = settings['scale']
-        self.tempo = settings['tempo']
-        self.lengths = settings['lengths']
+        self.intervals = settings['intervals']
 
     def clear_expired(self):
         now = time.time()

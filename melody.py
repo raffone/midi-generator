@@ -1,20 +1,22 @@
 import time
 import rtmidi
+from rtmidi.midiconstants import *
 import random as r
 from notes import *
+from instrument import Instrument
 
 
-class Melody:
+class Melody(Instrument):
 
-    def __init__(self, scale, tempo, lengths):
+    def __init__(self, settings, name='V. Melody'):
+        Instrument.__init__(self, settings, name)
 
-        self.midiout = rtmidi.MidiOut()
-        self.midiout.open_virtual_port("Midi Melody")
+        # self.midiout = rtmidi.MidiOut()
+        # self.midiout.open_virtual_port("Midi Melody")
 
-        self.stack = {}
-        self.scale = scale
-        self.tempo = tempo
-        self.lengths = lengths
+        # self.stack = {}
+
+        # self.lengths = lengths
 
     def get_note(self, name='C', root=3, span=False, random=False):
 
@@ -43,27 +45,12 @@ class Melody:
 
         # Suona nota.
         # print '%s nuova, aggiungo' % (note)
-        self.midiout.send_message([0x90, note, velocity])
+        self.midiout.send_message([NOTE_ON, note, velocity])
 
         # Aggiungi allo stack per la cancellazione allo scadere della durata
         now = time.time()
         self.stack[note] = now + duration
 
-    def clear_expired(self):
-
-        # print self.stack
-        now = time.time()
-        for note in self.stack.keys():
-            if self.stack[note] < now:
-                # print '%s vecchia, cancello' % (note)
-                self.midiout.send_message([0x80, note, 0])
-                del self.stack[note]
-                # self.stack.remove(note);
-
-    def clear_all(self):
-        for note in self.stack.keys():
-            self.midiout.send_message([0x80, note, 0])
-            del self.stack[note]
 
     def generate(self):
         # chord = []
@@ -106,11 +93,3 @@ class Melody:
 
         # Rimuovi note finite
         self.clear_expired()
-
-        # print len(self.stack)
-        # print '---'
-
-        # time.sleep(duration)
-
-        # Sleep dell'intervallo minimo tra note
-        # time.sleep(self.lengths[0])

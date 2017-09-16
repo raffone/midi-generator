@@ -20,6 +20,13 @@ settings = {
                 TEMPO * 1.25, TEMPO * 1.50, TEMPO * 1.75, TEMPO * 2.00, TEMPO * 2.5],
 }
 
+print settings
+
+# ----------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------
+
 # print TEMPO
 # print BASE_DURATIONS
 # MAIN LOOP
@@ -29,26 +36,37 @@ melody = Melody(settings)
 percussions = Percussions(settings)
 controls = Controls(settings)
 
+
 try:
     time.sleep(2)
-    controls.play_note(notes[1]['C'], 0.1)
-    controls.play_note(notes[1]['D'])
+    # controls.play_note(notes[1]['C'], 0.1)
+    # controls.play_note(notes[1]['D'])
     # time.sleep(5)
+
+    callcount = 0
+    interval = 15. / 80
+    started = time.time()
 
     while True:
 
-        print time.time()
+        # print time.time()
         melody.generate()
         percussions.generate()
         controls.generate()
-        print time.time()
+        # print time.time()
 
         # print melody.stack
         # print percussions.stack
         # print controls.stack
         print '---'
 
-        time.sleep(settings['lengths'][0])
+        callcount = callcount + 1
+        # Compensate for drift:
+        # calculate the time when the worker should be called again.
+        nexttime = started + callcount * interval
+        timetowait = max(0, nexttime - time.time())
+
+        time.sleep(timetowait)
 
 except (KeyboardInterrupt, SystemExit):
     controls.play_note(notes[1]['C#'])

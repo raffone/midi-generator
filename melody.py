@@ -51,7 +51,6 @@ class Melody(Instrument):
         now = time.time()
         self.stack[note] = now + duration
 
-
     def generate(self):
         # chord = []
         chance = r.random()

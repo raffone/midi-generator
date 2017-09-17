@@ -37,8 +37,7 @@ class Percussions(Instrument):
             self.stack[note] = now + self.intervals[0]
 
         # Se ritmo random e mutante e alla fine del pattern -> rigenera
-        if ('random' in settings and settings['random'] == True
-                and 'mutating' in settings and settings['mutating'] == True
+        if ('mutating' in settings and settings['mutating'] == True
                 and index == len(rhythm['pattern']) - 1):
 
             print('rigenero', name)
@@ -51,5 +50,11 @@ class Percussions(Instrument):
     def generate(self):
 
         for name in self.kit:
-            # print self.kit[name]['settings']['note']
-            self.play_note(self.kit[name]['settings']['note'], self.kit[name])
+            note = self.kit[name]['settings']['note']
+            settings = self.kit[name]
+
+            if 'velocity' in self.kit[name]['settings']:
+                velocity = self.kit[name]['settings']['velocity']
+                self.play_note(note, settings, velocity)
+            else:
+                self.play_note(note, settings)

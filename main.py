@@ -27,30 +27,36 @@ settings = {'scale': scale, 'bpm': bpm, 'intervals': intervals}
 # ----------------------------------------------------------------------------
 melody = Melody(settings)
 drums = Percussions('Drums', settings, [{
-    'name': 'kick',
-    'note': notes[2]['C'],
-    'steps': {'count': 32},
-    'pulses': {'count': 2}
+    'name': 'kick', 'note': notes[2]['C'],
+    'steps': {'count': 16}, 'pulses': {'count': 1}
 }, {
-    'name': 'snare',
-    'note': notes[2]['E'],
-    'steps': {'count': 32},
-    'pulses': {'count': 4},
+    'name': 'kick2', 'note': notes[2]['C#'],
+    'steps': {'count': 32}, 'pulses': {'min': 2, 'max': 3},
+    'random': True, 'mutating': True,
+}, {
+    'name': 'snare', 'note': notes[2]['E'],
+    'steps': {'count': 32}, 'pulses': {'count': 4},
     'shift': {'count': 4}
 }, {
-    'name': 'hihat1',
-    'note': notes[2]['G#'],
-    'steps': {'min': 16, 'max': 32},
-    'pulses': {'min': 4, 'max': 8},
-    'random': True,
-    'mutating': True,
+    'name': 'snare2', 'note': notes[2]['E'],
+    'steps': {'count': 32}, 'pulses': {'min': 1, 'max': 2},
+    'random': True, 'mutating': True, 'velocity': 80,
 }, {
-    'name': 'hihat2',
-    'note': notes[2]['B'],
-    'steps': {'min': 16, 'max': 32},
-    'pulses': {'min': 4, 'max': 8},
-    'random': True,
-    'mutating': True,
+    'name': 'snare3', 'note': notes[2]['F'],
+    'steps': {'count': 8}, 'pulses': {'count': 1},
+    'shift': {'count': 4}
+}, {
+    'name': 'hihat3', 'note': notes[2]['F#'],
+    'steps': {'count': 32}, 'pulses': {'min': 1, 'max': 2},
+    'random': True, 'mutating': True,
+}, {
+    'name': 'hihat1', 'note': notes[2]['G#'],
+    'steps': {'min': 16, 'max': 32}, 'pulses': {'min': 2, 'max': 4},
+    'random': True, 'mutating': True,
+}, {
+    'name': 'hihat2', 'note': notes[2]['B'],
+    'steps': {'min': 16, 'max': 32}, 'pulses': {'min': 2, 'max': 4},
+    'random': True, 'mutating': True,
 }])
 
 glitch = Percussions('Glitch', settings, [{

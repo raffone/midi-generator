@@ -16,7 +16,9 @@ class Melody(Instrument):
     def get_note(self, name='C', root=3, span=False, random=False):
 
         # Se random scegli a caso nella scala
-        if random is True:
+        if type(name) is list:
+            name = r.choice(name)
+        elif random is True:
             name = r.choice(self.scale)
 
         index = self.scale.index(name)
@@ -61,9 +63,16 @@ class Melody(Instrument):
             if (len(self.stack) == 0 and self.settings['melody']['chance'] >= chance):
 
                 # Prima nota random
-                main_note = self.get_note(root=self.settings['melody']['root'],
-                                          span=self.settings['melody']['span'],
-                                          random=self.settings['melody']['random'])
+                # Se e' stata passata una lista di note usa quelle
+                if ('notes' in self.settings['melody']):
+                    main_note = self.get_note(name=self.settings['melody']['notes'],
+                                              root=self.settings['melody']['root'],
+                                              span=self.settings['melody']['span'],
+                                              random=self.settings['melody']['random'])
+                else:
+                    main_note = self.get_note(root=self.settings['melody']['root'],
+                                              span=self.settings['melody']['span'],
+                                              random=self.settings['melody']['random'])
 
                 # Se richiesto evito di ripetere note attualmente suonate
                 if not self.settings['melody']['note_repeat']:
@@ -83,7 +92,7 @@ class Melody(Instrument):
                     # print chord
 
                     if chord['chance'] >= chance:
-                        print main_note
+                        # print main_note
                         if 'follow_main_note' in chord and main_note != '':
                             var = r.choice(chord['offset'])
                             index = self.scale[(main_note['index'] + var) % len(self.scale)]
@@ -93,7 +102,7 @@ class Melody(Instrument):
                         note = self.get_note(name=index,
                                              root=chord['root'],
                                              span=chord['span'],
-                                             random=self.settings['melody']['random'])
+                                             random=chord['random'])
 
                         self.play_note(note=note['value'],
                                        duration=r.choice(chord['length']),

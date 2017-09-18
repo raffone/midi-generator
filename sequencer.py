@@ -23,14 +23,20 @@ class Sequencer:
         self.interval = 15. / self.settings['bpm']
         self.started = time.time()
 
+        # Play e record su live
+        # self.controls.play_note(notes[1]['C'])
+        # self.controls.play_note(notes[1]['D'])
+
         # Main loop
         while True:
             for instrument in self.instruments:
-                instrument.generate()
                 instrument.clear_expired()
+                instrument.generate()
                 print instrument.stack
 
             print '----'
+
+            self.controls.clear_expired()
 
             # Intervallo con calcolo del drift
             self.callcount += 1

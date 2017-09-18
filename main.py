@@ -11,7 +11,8 @@ def calc_bpm(tempo=120.0):
 
 # SETUP MUSIC
 # ----------------------------------------------------------------------------
-scale = scales['minor']['D#']
+# scale = scales['minor']['D#']
+scale = scales['pentatonic']['D#']
 bpm = 80
 base_interval = calc_bpm(bpm)
 # intervals = [base_interval * 0.25, base_interval * 0.33, base_interval * 0.50,
@@ -55,11 +56,35 @@ melody = Melody('Melody', global_settings, {
 bass = Melody('Bass', global_settings, {
     'type': ['melody'],  # melody, chord
     'melody': {
+
         'chance': .1, 'note_repeat': False,
         'root': 2, 'span': 1, 'random': True,
-        'velocity': {'min': 70, 'max': 90},
+        'notes': [scale[0], scale[2], scale[4]],
+        'velocity': {'min': 90, 'max': 90},
         'length': intervals[2:6]
     },
+})
+# ----------------------------------------------------------------------------
+arp = Melody('Arp', global_settings, {
+    'type': ['chord'],  # melody, chord
+    'chord': {
+        'notes': [{
+            'chance': 1,
+            'root': 2, 'span': 2, 'random': True,
+            'velocity': {'min': 90, 'max': 110},
+            'length': [intervals[4]]
+        }, {
+            'chance': 1,
+            'root': 2, 'span': 2, 'random': True,
+            'velocity': {'min': 90, 'max': 110},
+            'length': [intervals[4]]
+        }, {
+            'chance': 1,
+            'root': 2, 'span': 2, 'random': True,
+            'velocity': {'min': 90, 'max': 110},
+            'length': [intervals[4]]
+        }, ]
+    }
 })
 # ----------------------------------------------------------------------------
 drums = Percussions('Drums', global_settings, [{
@@ -71,16 +96,16 @@ drums = Percussions('Drums', global_settings, [{
     'random': True, 'mutating': True,
 }, {
     'name': 'snare', 'note': notes[2]['E'],
-    'steps': {'count': 32}, 'pulses': {'count': 4},
+    'steps': {'count': 8}, 'pulses': {'count': 1},
     'shift': {'count': 4}
+}, {
+    'name': 'snare3', 'note': notes[2]['F'],
+    'steps': {'count': 32}, 'pulses': {'count': 1},
+    'shift': {'count': 28}
 }, {
     'name': 'snare2', 'note': notes[2]['E'],
     'steps': {'count': 32}, 'pulses': {'min': 1, 'max': 2},
     'random': True, 'mutating': True, 'velocity': 80,
-}, {
-    'name': 'snare3', 'note': notes[2]['F'],
-    'steps': {'count': 8}, 'pulses': {'count': 1},
-    'shift': {'count': 4}
 }, {
     'name': 'hihat3', 'note': notes[2]['F#'],
     'steps': {'count': 32}, 'pulses': {'min': 1, 'max': 2},

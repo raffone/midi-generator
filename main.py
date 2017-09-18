@@ -21,12 +21,48 @@ intervals = [base_interval * 0.25, base_interval * 0.50, base_interval * 0.75, b
              base_interval * 1.25, base_interval * 1.50, base_interval * 1.75, base_interval * 2.00, ]
 
 
-settings = {'scale': scale, 'bpm': bpm, 'intervals': intervals}
+global_settings = {'scale': scale, 'bpm': bpm, 'intervals': intervals}
 
 # SEQUENCER
 # ----------------------------------------------------------------------------
-melody = Melody(settings)
-drums = Percussions('Drums', settings, [{
+melody = Melody('Melody', global_settings, {
+    'type': ['melody', 'chord'],  # melody, chord
+    'melody': {
+        'chance': .9, 'note_repeat': False,
+        'root': 4, 'span': 3, 'random': True,
+        'velocity': {'min': 70, 'max': 90},
+        'length': intervals[:5]
+    },
+    'chord': {
+        'notes': [{
+            'chance': .2,
+            'root': 3, 'span': 2, 'random': False,
+            'follow_main_note': True,
+            'offset': [2, 5],
+            'velocity': {'min': 90, 'max': 110},
+            'length': intervals[4:]
+        }, {
+            'chance': .1,
+            'root': 2, 'span': 1, 'random': False,
+            'follow_main_note': True,
+            'offset': [2, 5],
+            'velocity': {'min': 60, 'max': 100},
+            'length': intervals[4:]
+        }]
+    }
+})
+# ----------------------------------------------------------------------------
+bass = Melody('Bass', global_settings, {
+    'type': ['melody'],  # melody, chord
+    'melody': {
+        'chance': .1, 'note_repeat': False,
+        'root': 2, 'span': 1, 'random': True,
+        'velocity': {'min': 70, 'max': 90},
+        'length': intervals[2:6]
+    },
+})
+# ----------------------------------------------------------------------------
+drums = Percussions('Drums', global_settings, [{
     'name': 'kick', 'note': notes[2]['C'],
     'steps': {'count': 16}, 'pulses': {'count': 1}
 }, {
@@ -59,7 +95,10 @@ drums = Percussions('Drums', settings, [{
     'random': True, 'mutating': True,
 }])
 
-glitch = Percussions('Glitch', settings, [{
+# ----------------------------------------------------------------------------
+
+
+glitch = Percussions('Glitch', global_settings, [{
     'name': 'glitch1', 'note': notes[2]['C'],
     'steps': {'count': 64}, 'pulses': {'min': 4, 'max': 8},
     'random': True, 'mutating': True,
@@ -85,10 +124,9 @@ glitch = Percussions('Glitch', settings, [{
     'random': True, 'mutating': True,
 }])
 
+# ----------------------------------------------------------------------------
 
-# glitch = Percussions(name='Glitch')
-
-sequencer = Sequencer(settings, [melody, drums, glitch])
+sequencer = Sequencer(global_settings, [melody, bass, drums, glitch])
 
 try:
     sequencer.play()

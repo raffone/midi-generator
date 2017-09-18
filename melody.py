@@ -8,8 +8,10 @@ from instrument import Instrument
 
 class Melody(Instrument):
 
-    def __init__(self, global_settings, name='Melody'):
+    def __init__(self, name, global_settings, settings):
         Instrument.__init__(self, global_settings, name)
+
+        self.settings = settings
 
     def get_note(self, name='C', root=3, span=False, random=False):
 
@@ -46,42 +48,54 @@ class Melody(Instrument):
 
     def generate(self):
         # chord = []
-        chance = r.random()
+        chance = 1.00 - r.random()
 
-        # Se stack vuoto
-        case1 = len(self.stack) == 0 and chance >= .1
+        # print chance
+        # print 1.00 - chance
 
-        # Se stack non vuoto e non supeiore a 3
-        case2 = len(self.stack) != 0 and len(self.stack) <= 3 and chance >= .7
+        main_note = ''
 
-        if (case1 or case2):
-            # Prima nota random
-            note = self.get_note(root=4, span=3, random=True)
+        # TODO: migliorare il passaggio da una nota all'altra per evitare
+        # intervalli esagerati
+        if('melody' in self.settings):
+            if (len(self.stack) == 0 and self.settings['melody']['chance'] >= chance):
 
-            # Evito una nota gia nello stack
-            if note['value'] in self.stack:
-                return
+                # Prima nota random
+                main_note = self.get_note(root=self.settings['melody']['root'],
+                                          span=self.settings['melody']['span'],
+                                          random=self.settings['melody']['random'])
 
-            # duration = r.choice(self.intervals[0:3])
-            self.play_note(note['value'], r.choice(
-                self.intervals[:5]), r.randint(70, 90))
+                # Se richiesto evito di ripetere note attualmente suonate
+                if not self.settings['melody']['note_repeat']:
+                    if main_note['value'] in self.stack:
+                        return
 
-            # # Se durata minima di un battito possibilita' di diventare multinota
-            if chance >= .8:
-                var1 = r.choice([2, 5])
-                # var1 = r.randint(2, 5)
-                index1 = self.scale[(note['index'] + var1) % len(self.scale)]
-                note1 = self.get_note(index1, root=3, span=2, )
-                self.play_note(note1['value'], r.choice(
-                    self.intervals[4:]), r.randint(90, 110))
+                # Suona nota
+                self.play_note(note=main_note['value'],
+                               duration=r.choice(self.settings['melody']['length']),
+                               velocity=r.randint(self.settings['melody']['velocity']['min'],
+                                                  self.settings['melody']['velocity']['max']))
 
-            if chance >= .9:
-                var2 = r.choice([2, 5])
-                # var2 = r.randint(2, 5)
-                index2 = self.scale[(note['index'] + var2) % len(self.scale)]
-                note2 = self.get_note(index1, root=2, span=1, )
-                self.play_note(note2['value'], r.choice(
-                    self.intervals[7:]), r.randint(60, 100))
+        if('chord' in self.settings):
+            if len(self.stack) <= len(self.settings['chord']):
+                for chord in self.settings['chord']['notes']:
+                    # print 'chord'
+                    # print chord
 
-        # # Rimuovi note finite
-        # self.clear_expired()
+                    if chord['chance'] >= chance:
+                        print main_note
+                        if 'follow_main_note' in chord and main_note != '':
+                            var = r.choice(chord['offset'])
+                            index = self.scale[(main_note['index'] + var) % len(self.scale)]
+                        else:
+                            index = r.choice(self.scale)
+
+                        note = self.get_note(name=index,
+                                             root=chord['root'],
+                                             span=chord['span'],
+                                             random=self.settings['melody']['random'])
+
+                        self.play_note(note=note['value'],
+                                       duration=r.choice(chord['length']),
+                                       velocity=r.randint(chord['velocity']['min'],
+                                                          chord['velocity']['max']))
